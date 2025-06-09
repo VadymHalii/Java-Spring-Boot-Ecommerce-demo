@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <div th:fragment="product-list">
+        <div th:if="${products.isEmpty()}" class="empty-state">
+            <h3>📦 No products found</h3>
+            <p>Click "Load Products from API" to fetch products.</p>
+        </div>
+        
+        <div th:unless="${products.isEmpty()}">
+            <p style="margin-bottom: 20px; color: #666;">
+                Found <strong th:text="${products.size()}">0</strong> products
+            </p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${products}">
+                        <td>
+                            <strong th:text="${product.name}">Product Name</strong>
+                        </td>
+                        <td>
+                            <span th:if="${product.category}" 
+                                  class="badge" 
+                                  th:text="${product.category}">
+                            </span>
+                            <span th:unless="${product.category}">-</span>
+                        </td>
+                        <td>
+                            <span th:if="${product.price}" 
+                                  th:text="'$' + ${#numbers.formatDecimal(product.price, 1, 2)}">$0.00</span>
+                            <span th:unless="${product.price}">-</span>
+                        </td>
+                        <td>
+                            <span th:if="${product.description}" 
+                                  th:text="${#strings.abbreviate(product.description, 50)}"
+                                  th:title="${product.description}">
+                            </span>
+                            <span th:unless="${product.description}">-</span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <button class="edit-btn"
+                                        th:hx-get="@{/products/{id}/edit(id=${product.id})}"
+                                        hx-target="#form-container">
+                                    Edit
+                                </button>
+                                <button class="delete-btn"
+                                        th:hx-delete="@{/products/{id}(id=${product.id})}"
+                                        hx-target="#product-container"
+                                        hx-confirm="Are you sure you want to delete this product?">
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

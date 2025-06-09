@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.12.0/cdn/themes/light.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.12.0/cdn/shoelace.js"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .controls { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+        .htmx-indicator { 
+            opacity: 0; 
+            transition: opacity 500ms ease-in;
+        }
+        .htmx-request .htmx-indicator { 
+            opacity: 1; 
+        }
+        .htmx-request.htmx-indicator { 
+            opacity: 1; 
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Product Management System</h1>
+            <sl-button variant="primary" 
+                       hx-post="/products/load" 
+                       hx-target="#product-container"
+                       hx-indicator="#loading">
+                Load Products from API
+            </sl-button>
+        </div>
+        
+        <div class="controls">
+            <div class="search-box">
+                <sl-input placeholder="Search products..." 
+                          hx-get="/products/search" 
+                          hx-target="#product-container"
+                          hx-trigger="keyup changed delay:500ms"
+                          name="query">
+                </sl-input>
+            </div>
+            
+            <sl-select placeholder="Filter by category" 
+                       hx-get="/products/category/" 
+                       hx-target="#product-container"
+                       name="category"
+                       clearable>
+                <sl-option value="">All Categories</sl-option>
+                <sl-option th:each="category : ${categories}" 
+                           th:value="${category}" 
+                           th:text="${category}">
+                </sl-option>
+            </sl-select>
+            
+            <sl-button variant="success" 
+                       hx-get="/products/new" 
+                       hx-target="#form-container">
+                Add New Product
+            </sl-button>
+        </div>
+        
+        <div id="loading" class="htmx-indicator loading">
+            <sl-spinner style="font-size: 2rem;"></sl-spinner>
+            <p>Loading products...</p>
+        </div>
+        
+        <div id="form-container"></div>
+        
+        <div id="product-container" 
+             hx-get="/products/list" 
+             hx-trigger="load"
+             hx-indicator="#loading">
+        </div>
+    </div>
+
+    <script>
+        // Handle category selection
+        document.addEventListener('sl-change', function(event) {
+            if (event.target.name === 'category') {
+                const category = event.target.value;
+                if (category) {
+                    htmx.ajax('GET', `/products/category/${category}`, '#product-container');
+                } else {
+                    htmx.ajax('GET', '/products/list', '#product-container');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Management Test</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+    <h1>Product Management Test Page</h1>
+    
+    <p>This is a test page to verify the application is working properly.</p>
+    
+    <h2>Manual Test Steps:</h2>
+    <ol>
+        <li><strong>Load Products:</strong> <button onclick="loadProducts()">Load Products from API</button></li>
+        <li><strong>View Products:</strong> <a href="http://localhost:8080/products/list" target="_blank">View Products List</a></li>
+        <li><strong>Add Product:</strong> <a href="http://localhost:8080/products/new" target="_blank">Add New Product Form</a></li>
+        <li><strong>Search Products:</strong> <a href="http://localhost:8080/products/search?query=jacket" target="_blank">Search for "jacket"</a></li>
+    </ol>
+    
+    <h2>Test HTMX Functionality:</h2>
+    <div>
+        <button hx-post="http://localhost:8080/products/load" 
+                hx-target="#result"
+                hx-indicator="#loading">
+            HTMX Load Products
+        </button>
+        <div id="loading" class="htmx-indicator">Loading...</div>
+        <div id="result"></div>
+    </div>
+    
+    <h2>Direct API Test:</h2>
+    <div>
+        <button onclick="testAPI()">Test External API</button>
+        <div id="api-result"></div>
+    </div>
+    
+    <script>
+        function loadProducts() {
+            fetch('http://localhost:8080/products/load', {
+                method: 'POST'
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert('Load response: ' + data.substring(0, 200));
+            })
+            .catch(error => {
+                alert('Error: ' + error);
+            });
+        }
+        
+        function testAPI() {
+            fetch('https://famme.no/products.json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('api-result').innerHTML = 
+                    `<pre>Found ${data.products?.length || 0} products in external API</pre>`;
+            })
+            .catch(error => {
+                document.getElementById('api-result').innerHTML = 
+                    `<pre>Error: ${error}</pre>`;
+            });
+        }
+        
+        // Add HTMX indicators style
+        const style = document.createElement('style');
+        style.textContent = `
+            .htmx-indicator { opacity: 0; transition: opacity 500ms ease-in; }
+            .htmx-request .htmx-indicator { opacity: 1; }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
