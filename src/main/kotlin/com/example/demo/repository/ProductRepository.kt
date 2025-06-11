@@ -18,7 +18,7 @@ class ProductRepository(private val jdbcClient: JdbcClient) {
                     description = rs.getString("description"),
                     price = rs.getBigDecimal("price"),
                     category = rs.getString("category"),
-                    variants = null, // Simplified for JdbcClient
+                    variants = null,
                     createdAt = rs.getTimestamp("created_at").toLocalDateTime(),
                     updatedAt = rs.getTimestamp("updated_at").toLocalDateTime()
                 )
@@ -84,7 +84,6 @@ class ProductRepository(private val jdbcClient: JdbcClient) {
     
     fun save(product: Product): Product {
         if (product.id == null) {
-            // Insert new product - for H2 we'll use a simple approach
             jdbcClient.sql("""
                 INSERT INTO products (name, description, price, category, variants, created_at, updated_at) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -98,14 +97,12 @@ class ProductRepository(private val jdbcClient: JdbcClient) {
                 .param(product.updatedAt)
                 .update()
             
-            // Get the last inserted ID (simplified for demo)
             val lastId = jdbcClient.sql("SELECT MAX(id) FROM products")
                 .query(Long::class.java)
                 .single()
             
             return product.copy(id = lastId)
         } else {
-            // Update existing product
             jdbcClient.sql("""
                 UPDATE products 
                 SET name = ?, description = ?, price = ?, category = ?, variants = ?, updated_at = ?

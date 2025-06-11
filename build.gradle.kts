@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "2.1.0"
-    kotlin("plugin.spring") version "2.1.0"
-    kotlin("plugin.jpa") version "2.1.0"
-    id("org.springframework.boot") version "4.0.0-SNAPSHOT"
+    kotlin("jvm") version "2.1.21"
+    kotlin("plugin.spring") version "2.1.21"
+    kotlin("plugin.jpa") version "2.1.21"
+    id("org.springframework.boot") version "3.5.0"
     id("io.spring.dependency-management") version "1.1.7"
 }
 
@@ -23,8 +23,6 @@ configurations {
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://repo.spring.io/milestone") }
-    maven { url = uri("https://repo.spring.io/snapshot") }
 }
 
 dependencies {
@@ -37,8 +35,8 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.webjars:webjars-locator-core")
-    implementation("org.webjars.npm:htmx.org:1.9.12")
-    implementation("org.webjars.npm:shoelace-style__shoelace:2.12.0")
+    implementation("org.webjars.npm:htmx.org:2.0.4")
+    implementation("org.webjars.npm:shoelace-style__shoelace:2.20.1")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")

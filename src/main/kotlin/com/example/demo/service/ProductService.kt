@@ -22,7 +22,7 @@ class ProductService(
     
     private val logger = LoggerFactory.getLogger(ProductService::class.java)
     
-    @Scheduled(fixedRate = 3600000) // Run every hour
+    @Scheduled(fixedRate = 3600000)
     @Async
     @Transactional
     fun fetchAndSaveProducts() {
@@ -34,7 +34,6 @@ class ProductService(
             val products = mutableListOf<Product>()
             var count = 0
             
-            // The API returns {"products": [...]} structure
             val productsArray = jsonNode.get("products")
             if (productsArray != null && productsArray.isArray) {
                 for (productNode in productsArray) {
@@ -62,11 +61,9 @@ class ProductService(
     private fun parseProduct(productNode: JsonNode): Product {
         val name = productNode.get("title")?.asText() ?: "Unknown Product"
         val rawDescription = productNode.get("body_html")?.asText()?.takeIf { it.isNotBlank() }
-        // Strip HTML and limit description length
         val description = rawDescription?.replace(Regex("<[^>]*>"), "")?.take(1000)
         val category = productNode.get("product_type")?.asText()?.takeIf { it.isNotBlank() }
         
-        // Extract price from first variant that has a price
         var price: BigDecimal? = null
         val variantsNode = productNode.get("variants")
         if (variantsNode != null && variantsNode.isArray && variantsNode.size() > 0) {

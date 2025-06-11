@@ -59,7 +59,6 @@
                 </div>
             </form>
             
-            <!-- Edit form with PUT method -->
             <form th:hx-put="${'/products/' + product.id}"
                   th:if="${product.id != null}"
                   hx-target="#product-container">
